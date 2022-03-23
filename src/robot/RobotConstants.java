@@ -13,22 +13,23 @@ public class RobotConstants {
     public static final int TURN_COST_90 = 60;
     public static final int MAX_COST = Integer.MAX_VALUE;
 
-//    public static final double LEFT_TURN_RADIUS_Y = 15; //17;
-//    public static final double LEFT_TURN_RADIUS_X = 28; //28;
-//    public static final double RIGHT_TURN_RADIUS_Y = 15; //17;
-//    public static final double RIGHT_TURN_RADIUS_X = 28; //28;
-
     //inside the lab
-    public static final double LEFT_TURN_RADIUS_Y = 30;//25; //17;
-    public static final double LEFT_TURN_RADIUS_X = 30;//32; //28;
-    public static final double RIGHT_TURN_RADIUS_Y = 30; //25; //17;
-    public static final double RIGHT_TURN_RADIUS_X = 30;//35; //28;
+    public static final double LEFT_TURN_RADIUS_Y = 28; //17;
+    public static final double LEFT_TURN_RADIUS_X = 24; //28;
+    public static final double RIGHT_TURN_RADIUS_Y = 30; //17;
+    public static final double RIGHT_TURN_RADIUS_X = 27; //28;
 
-    //outside the lab
-//    public static final double LEFT_TURN_RADIUS_Y = 30;//25; //17;
-//    public static final double LEFT_TURN_RADIUS_X = 31;//32; //28;
-//    public static final double RIGHT_TURN_RADIUS_Y = 29; //25; //17;
-//    public static final double RIGHT_TURN_RADIUS_X = 30;//35; //28;
+    //outside the lab 2
+//    public static final double LEFT_TURN_RADIUS_Y = 29; //29;//25; //17;
+//    public static final double LEFT_TURN_RADIUS_X = 27; //27;//30;//32; //28;
+//    public static final double RIGHT_TURN_RADIUS_Y = 27; //29; //25; //17;
+//    public static final double RIGHT_TURN_RADIUS_X = 20; //18;//35; //28;
+
+    //outside the lab 1
+//    public static final double LEFT_TURN_RADIUS_Y = 30;//30//25; //17;
+//    public static final double LEFT_TURN_RADIUS_X = 28;//32; //28;
+//    public static final double RIGHT_TURN_RADIUS_Y = 28; //25; //17;
+//    public static final double RIGHT_TURN_RADIUS_X = 21;//18;//35; //28;
 
     public static final double MOVE_SPEED = 21; // in cm per second
 
