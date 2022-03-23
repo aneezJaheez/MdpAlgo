@@ -1,9 +1,9 @@
-package algorithms;
+package algorithm;
 
 /**
  * Abstract class for both movement types (Arc and Line)
  */
-public abstract class MoveType {
+public abstract class Movement {
     private double x1;
     private double y1;
     private double x2;
@@ -12,7 +12,7 @@ public abstract class MoveType {
     private boolean isLine;
     private boolean isReverse;
 
-    public MoveType(double x1, double y1, double x2, double y2, int dirInDegrees, boolean isLine,
+    public Movement(double x1, double y1, double x2, double y2, int dirInDegrees, boolean isLine,
                     boolean isReverse) {
         this.x1 = x1;
         this.y1 = y1;

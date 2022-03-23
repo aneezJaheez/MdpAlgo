@@ -1,4 +1,4 @@
-package map;
+package environment;
 
 public class MapConstants {
     public static final int OBSTACLE_WIDTH = 10;

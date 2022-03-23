@@ -1,38 +1,36 @@
-package algorithms;
+package algorithm;
 
-import map.*;
-import robot.Robot;
+import environment.*;
+import environment.Map;
 import robot.RobotConstants;
 
-import java.awt.*;
-import java.awt.geom.Line2D;
 import java.util.*;
 import java.util.List;
 
 /**
  * This class will be used for planning the maneuver from one point to another
  */
-public class TripPlannerAlgo {
-    private final Arena arena;
+public class InterPathPlanner {
+    private final Map arena;
     private final int numCells = (MapConstants.ARENA_WIDTH / MapConstants.OBSTACLE_WIDTH) + MapConstants.ARENA_BORDER_SIZE * 2;
-    private Node[][][] grid; // grid dimensions: x,y,direction (of which there are 4: 0=east,1=north,2=west,3=south)
+    private Grid[][][] grid; // grid dimensions: x,y,direction (of which there are 4: 0=east,1=north,2=west,3=south)
     //private int[][][] turningArray; // array to keep track of whether turns are possible at this position
-    private final Map<Node, Node> predMap;
+    private final java.util.Map<Grid, Grid> predMap;
     private int[] endPosition; // use this to access the end position of our car.
-    private ArrayList<Node> nodePath;
+    private ArrayList<Grid> nodePath;
 
-    private PriorityQueue<Node> visitQueue; // min heap priority queue for nodes in the frontier
-    private Node currentNode;
+    private PriorityQueue<Grid> visitQueue; // min heap priority queue for nodes in the frontier
+    private Grid currentNode;
     private double totalCost = 0;
 
-    public TripPlannerAlgo(Arena arena) {
+    public InterPathPlanner(Map arena) {
         this.arena = arena;
         this.predMap = new HashMap<>();
         int robotX = arena.getRobot().getX();
         int robotY = arena.getRobot().getY();
         int robotDirection = arena.getRobot().getRobotDirectionAngle();
         endPosition = new int[]{robotX, robotY, robotDirection};
-        this.visitQueue = new PriorityQueue<>(new NodeComparator());
+        this.visitQueue = new PriorityQueue<>(new GridComparator());
     }
 
     public int[] getEndPosition() {
@@ -64,7 +62,7 @@ public class TripPlannerAlgo {
     /**
      * Checks if a node can be visited.
      */
-    private boolean canVisit(Node node) {
+    private boolean canVisit(Grid node) {
         return !node.isPicture() && !node.isVirtualObstacle() && !node.isVisited();
     }
 
@@ -102,7 +100,7 @@ public class TripPlannerAlgo {
      * given the node of a picture obstacle, get the goal node position
      */
     private int[] getGoalNodePosition(int x, int y, int dir) {
-        int dist = AlgoConstants.DISTANCE_FROM_GOAL;
+        int dist = AlgorithmConsts.DISTANCE_FROM_GOAL;
         int[] coords = new int[3];
         switch (dir) {
             case 0:
@@ -160,14 +158,14 @@ public class TripPlannerAlgo {
      * <p>
      * input: the x,y, and direction of the picture obstacle, the robot's turn radius
      */
-    public ArrayList<MoveType> planPath(int startX, int startY, int startAngle, int pictureX, int pictureY, int pictureDirInDegrees, boolean isPicturePos, boolean doBacktrack, boolean print) {
+    public ArrayList<Movement> planPath(int startX, int startY, int startAngle, int pictureX, int pictureY, int pictureDirInDegrees, boolean isPicturePos, boolean doBacktrack, boolean print) {
         if (0 > startX || startX >= numCells || 0 > startY || startY >= numCells) { // start is outside of bounds
             this.totalCost += 9999;
             return null;
         }
         clear();
         int endX, endY, endAngleDimension;
-        ArrayList<MoveType> path = null;
+        ArrayList<Movement> path = null;
         boolean goalFound = false;
         if (isPicturePos) {
             int[] goal = getGoalNodePosition(pictureX, pictureY, pictureDirInDegrees);
@@ -184,12 +182,12 @@ public class TripPlannerAlgo {
         // test if goal node s reachable
         if (!isValidLocation(endX, endY, endAngleDimension)) return null;
 
-        Node goalNode = grid[endY][endX][endAngleDimension];        // fetch the goal node from the grid array.
+        Grid goalNode = grid[endY][endX][endAngleDimension];        // fetch the goal node from the grid array.
         int maxTurnCountX = calculateTurnSizeX();            // get the number of grids that the car needs to move straight after changing directions (for a legal turn)
         int maxTurnCountY = calculateTurnSizeY();
         // this is the counter for the turnArray. Only when turnArray[y][x] = turnMaxCount is a turn allowed to be made.
         int x, y, dim;
-        Node nextNode;
+        Grid nextNode;
         int[] forwardLocation, leftLocation, rightLocation, backwardLocation;
         int nextX, nextY, nextDim, currentTurnCount;
         double currentGCost, hCost, gCost;
@@ -428,7 +426,7 @@ public class TripPlannerAlgo {
     /**
      * Heuristic algorithm using manhattan distance from start node to end node.
      */
-    private double heuristic(Node n1, Node n2, int endDim) {
+    private double heuristic(Grid n1, Grid n2, int endDim) {
         int abs1 = Math.abs(n1.getX() - n2.getX());
         int abs2 = Math.abs(n1.getY() - n2.getY());
         // prefer nodes in the same direction as the end direction
@@ -439,7 +437,7 @@ public class TripPlannerAlgo {
      * Greedy algorithm to calculate the path cost. Additional weight
      * on turning to prefer a straight path when possible.
      */
-    private double greedy(Node n1, Node n2) {
+    private double greedy(Grid n1, Grid n2) {
         int turnCost = 0;
         int cost = RobotConstants.MOVE_COST;
 
@@ -473,10 +471,10 @@ public class TripPlannerAlgo {
     /**
      * backtrack from the goal node to get the path
      */
-    private ArrayList<MoveType> backtrack(Node end, boolean print) {
-        Node curr, prev;
-        ArrayList<Node> path = new ArrayList<>();
-        ArrayList<MoveType> pathSegments = new ArrayList<>();
+    private ArrayList<Movement> backtrack(Grid end, boolean print) {
+        Grid curr, prev;
+        ArrayList<Grid> path = new ArrayList<>();
+        ArrayList<Movement> pathSegments = new ArrayList<>();
         path.add(end);
         curr = end;
         int midpoint = MapConstants.OBSTACLE_WIDTH / 2;
@@ -514,7 +512,7 @@ public class TripPlannerAlgo {
                         break;
                     default: // wut
                 }
-                pathSegments.add(new LineMove(lineStart[0], lineStart[1], lineEnd[0], lineEnd[1], currDir * 90, true, reversing));
+                pathSegments.add(new StraightMovement(lineStart[0], lineStart[1], lineEnd[0], lineEnd[1], currDir * 90, true, reversing));
             } else if (prev.getDim() != currDir) { // otherwise, only look for points where direction changes to construct the line segments
                 prevDir = prev.getDim();
                 lineStart[0] = curr.getX() * MapConstants.OBSTACLE_WIDTH + midpoint;
@@ -552,7 +550,7 @@ public class TripPlannerAlgo {
                         break;
                     default: // wut
                 }
-                pathSegments.add(new LineMove(lineStart[0], lineStart[1], lineEnd[0], lineEnd[1], dirInDegrees, true, reversing));
+                pathSegments.add(new StraightMovement(lineStart[0], lineStart[1], lineEnd[0], lineEnd[1], dirInDegrees, true, reversing));
 
                 // now, calculate the turn between the two points.
                 // Note: start of the curve = prev location (lineEnd of the next line). End of the curve = lineStart coordinates
@@ -573,7 +571,7 @@ public class TripPlannerAlgo {
                         break;
                     default: // wut
                 }
-                pathSegments.add(new ArcMove(lineEnd[0], lineEnd[1], lineStart[0], lineStart[1], dirInDegrees, radiusX, radiusY, false, turnLeft));
+                pathSegments.add(new TurnMovement(lineEnd[0], lineEnd[1], lineStart[0], lineStart[1], dirInDegrees, radiusX, radiusY, false, turnLeft));
             }
             curr = prev;
         }
@@ -582,19 +580,19 @@ public class TripPlannerAlgo {
         nodePath = path; // save the path for sending to android team
         Collections.reverse(pathSegments);
 
-        for (MoveType i : pathSegments) System.out.println(i.toString());
+        for (Movement i : pathSegments) System.out.println(i.toString());
 
         return pathSegments;
     }
 
-    public ArrayList<Node> getNodePath() {
+    public ArrayList<Grid> getNodePath() {
         return nodePath;
     }
 
     private boolean isValidLocation(int x, int y, int dim) {
         if (x >= 0 && x < numCells && y >= 0 && y < numCells) {
             if (y >= MapConstants.ARENA_BORDER_SIZE && y <= numCells - MapConstants.ARENA_BORDER_SIZE) {
-                Node n = grid[y][x][dim];
+                Grid n = grid[y][x][dim];
                 return canVisit(n);
             }
         }
@@ -605,21 +603,21 @@ public class TripPlannerAlgo {
      * Instantiate the grid map.
      */
     public void constructMap() {
-        ArrayList<PictureObstacle> pictureObstacleList = arena.getObstacles();
+        ArrayList<Obstacle> pictureObstacleList = arena.getObstacles();
 
-        grid = new Node[numCells][numCells][4]; // instantiate the grid (we assume it is a square grid), and that we have 4 possible cardinal directions
+        grid = new Grid[numCells][numCells][4]; // instantiate the grid (we assume it is a square grid), and that we have 4 possible cardinal directions
         // fill up the grid map
         for (int i = 0; i < numCells; i++) {
             for (int j = 0; j < numCells; j++) {
                 for (int k = 0; k < 4; k++) {
-                    grid[i][j][k] = new Node(false, false, j, i, k);
+                    grid[i][j][k] = new Grid(false, false, j, i, k);
                 }
             }
         }
 
         int angleDimension, x, y, id;
         // set picture nodes to isObstacle = true
-        for (PictureObstacle pictures : pictureObstacleList) {
+        for (Obstacle pictures : pictureObstacleList) {
             x = pictures.getX();
             y = pictures.getY();
             id = pictureObstacleList.indexOf(pictures);
@@ -630,7 +628,7 @@ public class TripPlannerAlgo {
             for (int i = 0; i < 4; i++) {
                 grid[y][x][i].setVirtualObstacle(true);
             }
-            int[][] pairs = getVirtualObstaclePairs(x, y, AlgoConstants.BORDER_THICKNESS);
+            int[][] pairs = getVirtualObstaclePairs(x, y, AlgorithmConsts.BORDER_THICKNESS);
             int xVirtual, yVirtual;
             // set the surrounding nodes to be virtual obstacles
             for (int[] pair : pairs) {
@@ -684,7 +682,7 @@ public class TripPlannerAlgo {
         return pairArray;
     }
 
-    public void printPath(List<Node> path) {
+    public void printPath(List<Grid> path) {
 
         char[][] printArray = new char[numCells][numCells];
         for (int y = 0; y < numCells; y++) {
@@ -697,7 +695,7 @@ public class TripPlannerAlgo {
                 else printArray[y][x] = '-';
             }
         }
-        for (Node n : path) {
+        for (Grid n : path) {
             int dir = n.getDim();
             switch (dir) {
                 case 0:
@@ -756,7 +754,7 @@ public class TripPlannerAlgo {
     // just check if the node is not a virtual obstacle or a picture obstacle.
     private boolean canGo(int x, int y, int dim) {
         if (x >= 0 && x < numCells && y >= 0 && y < numCells) {
-            Node n = grid[y][x][dim];
+            Grid n = grid[y][x][dim];
             return !n.isPicture() && !n.isVirtualObstacle();
         } else {
             return false;

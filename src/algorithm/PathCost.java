@@ -1,7 +1,7 @@
-package algorithms;
+package algorithm;
 
-import map.Arena;
-import map.PictureObstacle;
+import environment.Map;
+import environment.Obstacle;
 import robot.Robot;
 import robot.RobotConstants;
 
@@ -10,13 +10,13 @@ import java.util.ArrayList;
 /**
  * Class for runnable function when doing multi-threading exhaustive search
  */
-public class PathCostAlgo {
+public class PathCost {
     /**
      * Calculate the path cost for a given permutation
      */
-    public double getPathCost(int[] path, ArrayList<PictureObstacle> list, TripPlannerAlgo algo, Arena arena) {
+    public double getPathCost(int[] path, ArrayList<Obstacle> list, InterPathPlanner algo, Map arena) {
         //double pathDistance = 0.0;
-        PictureObstacle next;
+        Obstacle next;
         Robot bot = arena.getRobot();
         int startX = bot.getX();
         int startY = bot.getY();

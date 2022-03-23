@@ -1,23 +1,20 @@
-package map;
+package environment;
 
 import robot.Robot;
 import robot.RobotConstants;
 
 import javax.swing.*;
-import java.awt.*;
 import java.lang.Math;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class represents the arena in which the car will run
  */
-public class Arena extends JPanel {
-    private static ArrayList<PictureObstacle> obstacles;
+public class Map extends JPanel {
+    private static ArrayList<Obstacle> obstacles;
     private static Robot bot;
 
-    public Arena(Robot bot) {
+    public Map(Robot bot) {
         this.bot = bot;
         System.out.printf("Bot at %d, %d\n", bot.getX(), bot.getY());
         obstacles = new ArrayList<>();
@@ -32,7 +29,7 @@ public class Arena extends JPanel {
      */
     public boolean addPictureObstacle(int x, int y, int id, MapConstants.IMAGE_DIRECTION imageDirection) {
         int numGrids = (MapConstants.ARENA_WIDTH / MapConstants.OBSTACLE_WIDTH) + MapConstants.ARENA_BORDER_SIZE * 2;
-        PictureObstacle obstacle = new PictureObstacle(x + MapConstants.ARENA_BORDER_SIZE, y + MapConstants.ARENA_BORDER_SIZE, id, imageDirection);
+        Obstacle obstacle = new Obstacle(x + MapConstants.ARENA_BORDER_SIZE, y + MapConstants.ARENA_BORDER_SIZE, id, imageDirection);
         if (x < 0 || x >= numGrids || y < 0 || y >= numGrids) {
             System.out.println("Position is out of bounds");
             return false;
@@ -41,7 +38,7 @@ public class Arena extends JPanel {
             System.out.printf("Cannot add obstacle centered at <%d, %d> due to overlap with car\n", x, y);
             return false;
         }
-        for (PictureObstacle i : obstacles) {
+        for (Obstacle i : obstacles) {
             if (overlapWithObstacle(i, obstacle)) {
                 System.out.printf("Cannot add obstacle centered at <%d, %d> due to overlap with obstacle\n", x, y);
                 return false;
@@ -55,7 +52,7 @@ public class Arena extends JPanel {
     /**
      * check whether the new obstacle is overlapping with the car
      */
-    private boolean overlapWithCar(PictureObstacle obstacle) {
+    private boolean overlapWithCar(Obstacle obstacle) {
         int minimumGap = (RobotConstants.ROBOT_VIRTUAL_WIDTH - MapConstants.OBSTACLE_WIDTH) / 2 / MapConstants.OBSTACLE_WIDTH;
 
         return (Math.abs(obstacle.getX() - bot.getX()) < minimumGap + 1 && Math.abs(obstacle.getY() - bot.getY()) < minimumGap + 1);
@@ -67,11 +64,11 @@ public class Arena extends JPanel {
      * @param obs2
      * @return
      */
-    private boolean overlapWithObstacle(PictureObstacle obs1, PictureObstacle obs2) {
+    private boolean overlapWithObstacle(Obstacle obs1, Obstacle obs2) {
         return (obs1.getX() == obs2.getX()) && (obs1.getY() == obs2.getY());
     }
 
-    public static ArrayList<PictureObstacle> getObstacles() {
+    public static ArrayList<Obstacle> getObstacles() {
         return obstacles;
     }
 

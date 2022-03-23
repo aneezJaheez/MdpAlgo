@@ -1,14 +1,14 @@
-package map;
+package environment;
 
 import java.util.Comparator;
 
 /**
  * A helper class for comparing the costs between two nodes
  */
-public class NodeComparator implements Comparator<Node> {
+public class GridComparator implements Comparator<Grid> {
 
     @Override
-    public int compare(Node o1, Node o2) {
+    public int compare(Grid o1, Grid o2) {
         double c1 = o1.getCost();
         double c2 = o2.getCost();
         if (c1 < c2) return -1;

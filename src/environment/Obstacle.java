@@ -1,18 +1,18 @@
-package map;
+package environment;
 
 import java.awt.*;
 
-import map.MapConstants.IMAGE_DIRECTION;
+import environment.MapConstants.IMAGE_DIRECTION;
 
 /**
  * This class represents the obstacles with picture in the arena
  */
-public class PictureObstacle {
+public class Obstacle {
     private int imageId;
     private IMAGE_DIRECTION imageDirection;
     private Point centerCoordinate;
 
-    public PictureObstacle(int x, int y, int imageId, IMAGE_DIRECTION imageDirection) {
+    public Obstacle(int x, int y, int imageId, IMAGE_DIRECTION imageDirection) {
         this.imageDirection = imageDirection;
         this.centerCoordinate = new Point(x, y);
         this.imageId = imageId;

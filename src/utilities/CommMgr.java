@@ -1,4 +1,4 @@
-package utils;
+package utilities;
 
 import java.io.*;
 import java.net.Socket;
@@ -37,7 +37,7 @@ public class CommMgr {
      */
     public boolean connectToRPi() {
         try {
-            socket = new Socket(CommConstants.HOST_ADDRESS, CommConstants.PORT);
+            socket = new Socket(CommunicationConstants.HOST_ADDRESS, CommunicationConstants.PORT);
             writer = new BufferedWriter(new OutputStreamWriter(new BufferedOutputStream(socket.getOutputStream())));
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             System.out.println("Connection established with RPi");

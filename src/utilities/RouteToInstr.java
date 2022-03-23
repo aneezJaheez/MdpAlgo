@@ -1,24 +1,24 @@
-package utils;
+package utilities;
 
-import algorithms.*;
-import map.Arena;
-import map.MapConstants;
-import map.Node;
-import map.PictureObstacle;
+import algorithm.*;
+import environment.Map;
+import environment.MapConstants;
+import environment.Grid;
+import environment.Obstacle;
 import robot.Robot;
 import robot.RobotConstants;
-import utils.CommConstants.INSTRUCTION_TYPE;
+import utilities.CommunicationConstants.INSTRUCTION_TYPE;
 
 import java.util.ArrayList;
 import org.json.*;
 
-public class PathToCommand {
+public class RouteToInstr {
     static Robot bot = new Robot(RobotConstants.ROBOT_INITIAL_CENTER_COORDINATES, RobotConstants.ROBOT_DIRECTION.NORTH, false);
-    static Arena arena = new Arena(bot);
+    static Map arena = new Map(bot);
     static CommMgr comm = CommMgr.getCommMgr();
 
-    static FastestPathAlgo fast = new FastestPathAlgo(arena);
-    static TripPlannerAlgo algo = new TripPlannerAlgo(arena);
+    static PathPlanner fast = new PathPlanner(arena);
+    static InterPathPlanner algo = new InterPathPlanner(arena);
 
 
     /**
@@ -45,13 +45,13 @@ public class PathToCommand {
      */
     private static void doThePath(int[] path) {
         algo.constructMap();
-        ArrayList<PictureObstacle> map = Arena.getObstacles();
+        ArrayList<Obstacle> map = Map.getObstacles();
         Robot r = arena.getRobot();
         int startX = r.getX();
         int startY = r.getY();
         int startAngle = r.getRobotDirectionAngle();
-        PictureObstacle next;
-        ArrayList<MoveType> arrayList;
+        Obstacle next;
+        ArrayList<Movement> arrayList;
         int count = 0;
         for (int i : path) {
             next = map.get(i);
@@ -76,9 +76,9 @@ public class PathToCommand {
      * @param moveList
      * @param i
      */
-    private static void sendMovesToRobot(ArrayList<MoveType> moveList, int i) {
+    private static void sendMovesToRobot(ArrayList<Movement> moveList, int i) {
         int tryCount = 4;
-        ArrayList<MoveType> backwardMoveList;
+        ArrayList<Movement> backwardMoveList;
         int[] coords;
 
         int[] backwardCoords;
@@ -115,12 +115,12 @@ public class PathToCommand {
      * @param moveList
      * @return
      */
-    private static String encodeMoves(ArrayList<MoveType> moveList) {
+    private static String encodeMoves(ArrayList<Movement> moveList) {
         String commandsToSend = ":STM:0008,";
         INSTRUCTION_TYPE instructionType;
         String formatted;
 
-        for (MoveType move : moveList) {
+        for (Movement move : moveList) {
             int measure = 0;
             if (move.isLine()) {
                 measure = (int) move.getLength();
@@ -132,7 +132,7 @@ public class PathToCommand {
                 }
                 commandsToSend += formatted + INSTRUCTION_TYPE.encode(instructionType) + ",";
             } else {
-                ArcMove moveConverted = (ArcMove) move;
+                TurnMovement moveConverted = (TurnMovement) move;
                 if (moveConverted.isTurnLeft()) {
                     instructionType = INSTRUCTION_TYPE.FORWARD_LEFT;
                 } else {
@@ -212,10 +212,10 @@ public class PathToCommand {
      * send the path to android to provide real time location update
      */
     private static void sendPathToAndroid() {
-        ArrayList<Node> path = algo.getNodePath();
+        ArrayList<Grid> path = algo.getNodePath();
         String pathString = ":AND:PATH,";
         // PATH|x,y,0-270|
-        for (Node n : path) {
+        for (Grid n : path) {
             pathString += "|" + (n.getX() - MapConstants.ARENA_BORDER_SIZE) + "," + (n.getY() - MapConstants.ARENA_BORDER_SIZE) + "," + n.getDim() * 90;
         }
         comm.sendMsg(pathString);

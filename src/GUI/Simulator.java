@@ -1,6 +1,6 @@
 package GUI;
 
-import algorithms.*;
+import algorithm.*;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -26,10 +26,9 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.text.Font;
 import javafx.util.converter.IntegerStringConverter;
-import map.Arena;
-import map.MapConstants;
-import map.MapConstants.IMAGE_DIRECTION;
-import map.PictureObstacle;
+import environment.Map;
+import environment.MapConstants;
+import environment.MapConstants.IMAGE_DIRECTION;
 import robot.Robot;
 import robot.RobotConstants;
 
@@ -51,19 +50,19 @@ public class Simulator extends Application {
     private double timeSeconds = 0;
 
     private static Robot bot;
-    private static FastestPathAlgo fast;
-    private static TripPlannerAlgo algo;
+    private static PathPlanner fast;
+    private static InterPathPlanner algo;
 
-    private static Arena arena = null;
+    private static Map arena = null;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         // arena section
         // graphics context
         bot = new Robot(RobotConstants.ROBOT_INITIAL_CENTER_COORDINATES, RobotConstants.ROBOT_DIRECTION.NORTH, false);
-        arena = new Arena(bot);
-        fast = new FastestPathAlgo(arena);
-        algo = new TripPlannerAlgo(arena);
+        arena = new Map(bot);
+        fast = new PathPlanner(arena);
+        algo = new InterPathPlanner(arena);
 
         Pane arenaPane = new Pane();
         arenaPane.setMinWidth(arenaSize);
@@ -192,8 +191,8 @@ public class Simulator extends Application {
     }
 
     public void runSimulation(Label label, Rectangle robot, Timeline timeline) {
-        ArrayList<ArrayList<MoveType>> moveList = new ArrayList<>();
-        ArrayList<PictureObstacle> pictureList = Arena.getObstacles();
+        ArrayList<ArrayList<Movement>> moveList = new ArrayList<>();
+        ArrayList<environment.Obstacle> pictureList = Map.getObstacles();
         SequentialTransition seqT = new SequentialTransition();
 
         algo.constructMap();
@@ -205,7 +204,7 @@ public class Simulator extends Application {
         startCoords[0] = bot.getX();
         startCoords[1] = bot.getY();
         startCoords[2] = bot.getRobotDirectionAngle();
-        PictureObstacle n;
+        environment.Obstacle n;
         for (int i : fastestPath) {
             n = pictureList.get(i);
             text += "<" + n.getX() + ", " + n.getY() + ">, ";
@@ -244,7 +243,7 @@ public class Simulator extends Application {
 
     }
 
-    private SequentialTransition getPathAnimation(Rectangle robot, ArrayList<ArrayList<MoveType>> pathList) {
+    private SequentialTransition getPathAnimation(Rectangle robot, ArrayList<ArrayList<Movement>> pathList) {
         //Creating a Path
         SequentialTransition seqT = new SequentialTransition();
         double radiusY, radiusX;
@@ -253,7 +252,7 @@ public class Simulator extends Application {
         double duration;
         int endDir;
 
-        ArrayList<MoveType> paths;
+        ArrayList<Movement> paths;
         int len = pathList.size();
         for (int i = 0; i < len; i++) {
             paths = pathList.get(i);
@@ -264,7 +263,7 @@ public class Simulator extends Application {
             }
             nextX = paths.get(0).getX1() * scale;
             nextY = paths.get(0).getY1() * scale;
-            for (MoveType move : paths) {
+            for (Movement move : paths) {
                 Path path = new Path();
                 PathTransition pathTransition = new PathTransition();
                 pathTransition.setNode(robot);
@@ -295,7 +294,7 @@ public class Simulator extends Application {
                     path.getElements().add(moveTo);
                     endDir = move.getDirInDegrees();
                     ArcTo turn = new ArcTo();
-                    ArcMove arc = (ArcMove) move;
+                    TurnMovement arc = (TurnMovement) move;
                     radiusY = arc.getRadiusY() * scale;
                     radiusX = arc.getRadiusX() * scale;
 

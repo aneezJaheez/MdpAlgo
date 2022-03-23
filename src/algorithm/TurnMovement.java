@@ -1,14 +1,14 @@
-package algorithms;
+package algorithm;
 
 /**
  * This class represents the turning movement.
  */
-public class ArcMove extends MoveType {
+public class TurnMovement extends Movement {
     private double radiusX;
     private double radiusY;
     private boolean turnLeft;
 
-    public ArcMove(double x1, double y1, double x2, double y2, int dirInDegrees, double radiusX, double radiusY, boolean isLine, boolean turnLeft) {
+    public TurnMovement(double x1, double y1, double x2, double y2, int dirInDegrees, double radiusX, double radiusY, boolean isLine, boolean turnLeft) {
         super(x1, y1, x2, y2, dirInDegrees, isLine, false);
         this.radiusX = radiusX;
         this.radiusY = radiusY;

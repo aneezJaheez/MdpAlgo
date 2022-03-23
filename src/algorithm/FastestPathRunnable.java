@@ -1,7 +1,7 @@
-package algorithms;
+package algorithm;
 
-import map.Arena;
-import map.PictureObstacle;
+import environment.Map;
+import environment.Obstacle;
 
 import java.util.ArrayList;
 import java.util.stream.IntStream;
@@ -12,9 +12,9 @@ import java.util.stream.IntStream;
 public class FastestPathRunnable implements Runnable {
     private double cost;
     private int[] order;
-    private Arena arena;
+    private Map arena;
 
-    public FastestPathRunnable(int[] order, Arena arena) {
+    public FastestPathRunnable(int[] order, Map arena) {
         this.order = order;
         this.arena = arena;
     }
@@ -23,11 +23,11 @@ public class FastestPathRunnable implements Runnable {
      * Do the fastest path calculation for the given permutation
      */
     public void run() {
-        ArrayList<PictureObstacle> list = Arena.getObstacles();
-        TripPlannerAlgo algo = new TripPlannerAlgo(arena);
+        ArrayList<Obstacle> list = Map.getObstacles();
+        InterPathPlanner algo = new InterPathPlanner(arena);
         int[] indexArray = IntStream.range(0, list.size()).toArray();
         try {
-            PathCostAlgo pathing = new PathCostAlgo();
+            PathCost pathing = new PathCost();
             cost = pathing.getPathCost(order, list, algo, arena);
         } catch (Exception e) {
             // Throwing an exception

@@ -1,6 +1,6 @@
 package robot;
 
-import map.MapConstants;
+import environment.MapConstants;
 
 import java.awt.*;
 

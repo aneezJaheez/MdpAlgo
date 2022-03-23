@@ -1,7 +1,7 @@
-package algorithms;
+package algorithm;
 
-import map.Arena;
-import map.PictureObstacle;
+import environment.Map;
+import environment.Obstacle;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,11 +11,11 @@ import java.util.stream.IntStream;
 /**
  * Algorithm class for calculating the shortest Hamiltonian path to each obstacle
  */
-public class FastestPathAlgo {
+public class PathPlanner {
 
-    private final Arena arena;
+    private final Map arena;
 
-    public FastestPathAlgo(Arena arena) {
+    public PathPlanner(Map arena) {
         this.arena = arena;
     }
 
@@ -23,7 +23,7 @@ public class FastestPathAlgo {
      * Plan the fastest path and return as an array
      */
     public int[] planFastestPath() {
-        ArrayList<PictureObstacle> list = Arena.getObstacles();
+        ArrayList<Obstacle> list = Map.getObstacles();
         int[] indexArray = IntStream.range(0, list.size()).toArray();
         List<int[]> permutations = getPermutations(indexArray); //getPermutations(Arena.getObstacles().keySet().stream().mapToInt(i -> i).toArray());
         double smallestCost = Double.MAX_VALUE;

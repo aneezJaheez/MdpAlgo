@@ -1,4 +1,4 @@
-package utils;
+package utilities;
 
 /**
  * xxxy
@@ -25,14 +25,14 @@ package utils;
  * multiply by 10 to get 1000ms, yes it’s calculated in milliseconds so that is equal to 1 second)
  */
 
-public class CommConstants {
+public class CommunicationConstants {
     public static final String HOST_ADDRESS = "192.168.19.20";
     public static final int PORT = 8002;
 
     public enum INSTRUCTION_TYPE {
         FORWARD, BACKWARD, FORWARD_LEFT, FORWARD_RIGHT, BACKWARD_LEFT, BACKWARD_RIGHT, SPECIAL, STOP_AFTER, RESET_WHEELS;
 
-        public static String encode(CommConstants.INSTRUCTION_TYPE i) {
+        public static String encode(CommunicationConstants.INSTRUCTION_TYPE i) {
             switch (i) {
                 case FORWARD:
                     return "0";

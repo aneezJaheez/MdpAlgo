@@ -1,9 +1,9 @@
-package map;
+package environment;
 
 /**
  * Class to represent nodes in arena grid.
  */
-public class Node {
+public class Grid {
     private boolean isPicture;
     private boolean hasBeenVisited;
     private int pictureId;
@@ -15,7 +15,7 @@ public class Node {
     private double gCost;
     private double totalCost;
 
-    public Node(boolean isPicture, boolean isVirtualObstacle, int x, int y, int dim) {
+    public Grid(boolean isPicture, boolean isVirtualObstacle, int x, int y, int dim) {
         this.isPicture = isPicture;
         this.isVirtualObstacle = isVirtualObstacle;
         this.x = x;
